@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jason's International Food Festival - Clean Edition</title>
+<style>
+:root{
+  --ink:#102a43;--deep:#0f172a;--cream:#fff7dc;--yellow:#ffd166;--green:#06d6a0;--red:#ef476f;--blue:#118ab2;--purple:#8b5cf6;
+}
+*{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);overflow:hidden;background:#ffe9a8}
+button{font-family:inherit;cursor:pointer;border:0;font-weight:900;transition:.12s transform,.12s filter} button:hover{transform:scale(1.04);filter:brightness(1.05)}
+.screen{position:absolute;inset:0;display:none}.screen.active{display:block}.center{height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px;gap:22px}
+h1{font-size:clamp(42px,6vw,82px);margin:0;color:#0b2545;text-shadow:0 5px #ffd166}.subtitle{font-size:clamp(22px,2.4vw,34px);max-width:1050px;line-height:1.25;color:#1f2937;font-weight:900}.small{font-size:18px;font-weight:800;color:#394150}
+.startBtn,.bigBtn{background:linear-gradient(180deg,#ffd166,#f59e0b);color:#111827;border-radius:26px;padding:20px 42px;font-size:30px;box-shadow:0 10px 0 #92400e}
+.mapGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;width:min(1120px,94vw)}.country{background:#fff7dc;color:#102a43;border-radius:30px;padding:28px;min-height:210px;box-shadow:0 10px 0 rgba(0,0,0,.18);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;font-size:25px}.country .flag{font-size:70px}.country.unlocked{animation:float 1.6s ease-in-out infinite;background:#dff7ff}.country.done{background:#d7ffe9}.country.locked{opacity:.4}@keyframes float{50%{transform:translateY(-8px)}}
+.gameWrap{height:100vh;display:grid;grid-template-rows:82px 1fr}.hud{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;align-items:center;padding:14px 22px;background:rgba(255,255,255,.72);backdrop-filter:blur(6px)}.hudBox{background:#fff;color:#102a43;border-radius:20px;padding:12px 18px;font-size:24px;font-weight:1000;box-shadow:0 6px 0 rgba(0,0,0,.12)}.timer{text-align:center;background:#ffdd57}.timer.warn{background:#ef476f;color:#fff;animation:pulse .7s infinite}@keyframes pulse{50%{transform:scale(1.07)}}
+.stage{height:100%;padding:22px;display:flex;flex-direction:column;align-items:center;gap:16px;background:linear-gradient(135deg,#fff3b0,#caf0f8)}.mission{background:#fff;border-radius:999px;padding:14px 34px;font-size:30px;font-weight:1000;color:#0b2545;box-shadow:0 8px 0 rgba(0,0,0,.12);animation:softFlash 1.2s infinite}@keyframes softFlash{50%{filter:brightness(1.15);transform:scale(1.02)}}
+.characters{display:grid;grid-template-columns:230px minmax(420px,760px) 230px;gap:22px;align-items:center;width:min(1260px,96vw)}.avatar{height:230px;border-radius:36px;background:#fff;box-shadow:0 10px 0 rgba(0,0,0,.14);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;font-size:94px}.nameTag{font-size:24px;font-weight:1000;color:#0f172a}.bubble{background:#fff;border-radius:34px;padding:28px;min-height:170px;display:flex;align-items:center;justify-content:center;font-size:34px;line-height:1.18;font-weight:1000;color:#102a43;box-shadow:0 10px 0 rgba(0,0,0,.14)}
+.card{width:min(1080px,94vw);background:rgba(255,255,255,.9);border-radius:36px;padding:24px;box-shadow:0 12px 0 rgba(0,0,0,.14)}.instruction{font-size:31px;font-weight:1000;color:#312e81;text-align:center;margin-bottom:18px}.options{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.option{min-height:86px;border-radius:28px;padding:18px;font-size:25px;color:#102a43;background:#dff7ff;box-shadow:0 7px 0 #7dd3fc}.option.good{background:#bbf7d0;box-shadow:0 7px 0 #22c55e}.option.bad{background:#fecdd3;box-shadow:0 7px 0 #fb7185}.feedback{margin-top:18px;min-height:64px;border-radius:24px;background:#fff7dc;color:#102a43;font-size:25px;font-weight:1000;display:flex;align-items:center;justify-content:center;text-align:center;padding:14px}.soundCtl{position:absolute;right:20px;bottom:18px;background:#102a43;color:#fff;padding:12px 20px;border-radius:999px;font-size:18px}.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}.piece{position:absolute;width:14px;height:20px;top:-30px;animation:fall 2.4s linear forwards}@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@media(max-width:900px){.characters{grid-template-columns:1fr}.avatar{height:150px;font-size:66px}.bubble{font-size:26px;min-height:120px}.options{grid-template-columns:1fr}.mapGrid{grid-template-columns:1fr 1fr}.hudBox{font-size:18px}}
+
+/* Singapore final food-stall mini game */
+.festivalBoard{display:grid;grid-template-rows:auto auto auto;gap:16px}
+.stalls{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.stall{background:#fff3c4;border-radius:24px;min-height:168px;padding:12px;box-shadow:0 7px 0 rgba(0,0,0,.16);display:flex;flex-direction:column;align-items:center;justify-content:space-between;color:#102a43;border:4px solid transparent}
+.stall.over{border-color:#f59e0b;transform:scale(1.03)}
+.stall.done{background:#bbf7d0;border-color:#22c55e}.stallIcon{font-size:42px}.stallName{font-size:20px;font-weight:1000;text-align:center}.stallHint{font-size:15px;font-weight:900;text-align:center;color:#374151;background:rgba(255,255,255,.75);border-radius:14px;padding:6px 8px;min-height:34px}
+.guests{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.guestCard{background:#eef6ff;border-radius:22px;padding:10px;min-height:142px;box-shadow:0 7px 0 #93c5fd;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#102a43;font-size:16px;font-weight:1000;text-align:center;cursor:grab;border:4px solid transparent}.guestCard:active{cursor:grabbing}.guestCard.selected{border-color:#f59e0b;background:#fef3c7;transform:scale(1.03)}.guestCard.matched{opacity:.35;filter:grayscale(.4);cursor:not-allowed}.guestAvatar{font-size:40px}.guestNeed{font-size:15px;line-height:1.15}.guestFlag{font-size:22px}.submitRow{display:flex;gap:14px;justify-content:center}.miniBtn{background:#ffd166;color:#102a43;border-radius:22px;padding:14px 30px;font-size:22px;box-shadow:0 7px 0 #d97706}.miniBtn.blue{background:#bfdbfe;box-shadow:0 7px 0 #3b82f6}.tinyNote{font-size:18px;font-weight:1000;text-align:center;color:#334155;background:#fff7dc;border-radius:18px;padding:10px}
+@media(max-width:900px){.stalls,.guests{grid-template-columns:1fr 1fr}.stall,.guestCard{min-height:130px}.stallName{font-size:18px}}
+
+</style>
+</head>
+<body>
+<div id="start" class="screen active"><div class="center"><h1>🌏 Jason's International Food Festival</h1><div class="subtitle">Help Jason respect different cultures, solve food conflicts, and build an inclusive festival.</div><button class="startBtn" onclick="startGame()">START FESTIVAL</button><div class="small">Sound starts after clicking Start.</div></div></div>
+<div id="map" class="screen"><div class="center"><h1>🛂 Festival Passport</h1><div class="subtitle">Complete each country challenge to collect passport stamps.</div><div class="mapGrid" id="countryMap"></div></div></div>
+<div id="game" class="screen"><div class="gameWrap"><div class="hud"><div class="hudBox" id="scoreBox">Score: 0</div><div class="hudBox timer" id="timer">45</div><div class="hudBox" id="countryBox">Country</div></div><div class="stage" id="stage"><div class="mission" id="mission">Analyze Culture</div><div class="characters"><div class="avatar"><div id="jasonFace">👨‍💼</div><div class="nameTag">Jason</div></div><div class="bubble" id="speech">Let's make everyone feel respected.</div><div class="avatar"><div id="hostFace">🌏</div><div class="nameTag" id="hostName">Host</div></div></div><div class="card" id="playArea"></div></div></div><button class="soundCtl" onclick="toggleMusic()" id="soundBtn">🔊 Music Loud</button></div>
+<div id="end" class="screen"><div class="center"><h1>🎉 Festival Success!</h1><div class="subtitle" id="finalMsg"></div><button class="bigBtn" onclick="location.reload()">PLAY AGAIN</button></div></div><div class="confetti" id="confetti"></div>
+<script>
+let score=0,level=0,time=45,timerInt=null,musicOn=true,audioCtx=null,bgOsc=null,bgGain=null,selected=0,bridgeCount=0;
+const levels=[
+{flag:'🇯🇵',name:'Japan',mission:'Step 1: Analyze Culture',host:'👘',hostName:'Japan Host',bg:['#fff3b0','#ffd6e0'],speech:'Japan: Build trust first. Be patient and respectful.',instruction:'Choose 3 respectful actions.',need:3,type:'multi',correct:['Exchange business cards politely','Thank them before business talk','Listen carefully'],wrong:['Demand best price immediately','Interrupt their explanation','Rush to sign contract']},
+{flag:'🇺🇸',name:'USA',mission:'Step 2: Identify Potential Conflicts',host:'👨‍💼',hostName:'USA Partner',bg:['#dff7ff','#fde68a'],speech:'USA: They want a clear, direct business proposal.',instruction:'Choose 3 direct business actions.',need:3,type:'multi',correct:['Show clear pricing','Explain ROI and benefits','Give a practical timeline'],wrong:['Avoid discussing numbers','Stay vague about next steps','Give only a long greeting']},
+{flag:'🇮🇳',name:'India',mission:'Step 2: Identify Potential Conflicts',host:'👩‍🍳',hostName:'India Chef',bg:['#fef3c7','#bbf7d0'],speech:'India: Some guests need vegetarian-friendly choices.',instruction:'Choose 2 suitable vegetarian dishes.',need:2,type:'multi',correct:['🥗 Paneer Curry','🍛 Vegetable Biryani'],wrong:['🍗 Chicken Wings','🥩 Beef Steak']},
+{flag:'🇮🇹',name:'Italy',mission:'Step 3: Design Communication Strategies',host:'👨‍🍳',hostName:'Italy Chef',bg:['#dcfce7','#fecaca'],speech:'Italy: The chef is proud of a family recipe.',instruction:'Choose the most respectful response.',type:'single',correct:['Ask about the story behind the recipe'],wrong:['Change the recipe without asking','Say tradition is not important','Tell them to copy another country']},
+{flag:'🇸🇬',name:'Singapore',mission:'Step 4 + 5: Bridge-Building & Role-Play',host:'👩‍💼',hostName:'SG Organiser',bg:['#dbeafe','#fef3c7'],speech:'Singapore: Final test. Make one plan that includes everyone.',instruction:'Choose the inclusive solution for each guest.',type:'bridge'}
+];
+function beep(freq=500,dur=.1,type='sine',vol=.35){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.value=freq;g.gain.value=vol;o.connect(g);g.connect(audioCtx.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);o.stop(audioCtx.currentTime+dur)}catch(e){}}
+function startBg(){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();bgOsc=audioCtx.createOscillator();bgGain=audioCtx.createGain();bgOsc.type='triangle';bgOsc.frequency.value=150;bgGain.gain.value=.20;bgOsc.connect(bgGain);bgGain.connect(audioCtx.destination);bgOsc.start();setInterval(()=>{if(bgOsc&&musicOn)bgOsc.frequency.value=[150,180,210,240,210,180][Math.floor(Date.now()/420)%6]},300)}catch(e){}}
+function toggleMusic(){musicOn=!musicOn;if(bgGain)bgGain.gain.value=musicOn?.20:0;document.getElementById('soundBtn').textContent=musicOn?'🔊 Music Loud':'🔇 Music Off'}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function startGame(){beep(700,.12,'square',.45);startBg();showMap()}
+function showMap(){clearInterval(timerInt);show('map');let html='';levels.forEach((l,i)=>{let cls=i<level?'done':i===level?'unlocked':'locked';html+=`<button class="country ${cls}" ${i===level?'onclick="startLevel()"':''}><div class="flag">${l.flag}</div><div>${l.name}</div><small>${i<level?'STAMPED ✅':i===level?'START':'LOCKED'}</small></button>`});document.getElementById('countryMap').innerHTML=html}
+function startLevel(){const l=levels[level];show('game');selected=0;bridgeCount=0;time=45;document.getElementById('timer').textContent=time;document.getElementById('timer').classList.remove('warn');document.getElementById('scoreBox').textContent='Score: '+score;document.getElementById('countryBox').textContent=l.flag+' '+l.name;document.getElementById('mission').textContent=l.mission;document.getElementById('hostFace').textContent=l.host;document.getElementById('hostName').textContent=l.hostName;document.getElementById('speech').textContent=l.speech;document.getElementById('stage').style.background=`linear-gradient(135deg,${l.bg[0]},${l.bg[1]})`;renderLevel(l);timerInt=setInterval(()=>{time--;document.getElementById('timer').textContent=time;if(time<=10)document.getElementById('timer').classList.add('warn');if(time<=0)fail('Time up. Try again!')},1000)}
+function renderLevel(l){let p=document.getElementById('playArea');if(l.type==='multi'||l.type==='single'){let cards=[...l.correct.map(t=>({t,c:1})),...l.wrong.map(t=>({t,c:0}))].sort(()=>Math.random()-.5);p.innerHTML=`<div class="instruction">${l.instruction}</div><div class="options">${cards.map(o=>`<button class="option" onclick="${l.type==='single'?'pickSingle':'pickMulti'}(this,${o.c})">${o.t}</button>`).join('')}</div><div class="feedback" id="feedback">Choose carefully. Respect builds trust.</div>`}
+else{p.innerHTML=`<div class="instruction">${l.instruction}</div>
+<div class="festivalBoard">
+  <div class="tinyNote">Drag a guest to the best food stall. You can also click a guest, then click a stall.</div>
+  <div class="stalls">
+    <div class="stall" data-stall="vegetarian" ondragover="allowDrop(event)" ondragleave="leaveStall(this)" ondrop="dropGuest(event,this)" onclick="stallClick(this)"><div class="stallIcon">🥗</div><div class="stallName">Vegetarian Corner</div><div class="stallHint">For vegetarian guests</div></div>
+    <div class="stall" data-stall="japanese" ondragover="allowDrop(event)" ondragleave="leaveStall(this)" ondrop="dropGuest(event,this)" onclick="stallClick(this)"><div class="stallIcon">🍣</div><div class="stallName">Japanese Cuisine</div><div class="stallHint">Fresh, light flavours</div></div>
+    <div class="stall" data-stall="fast" ondragover="allowDrop(event)" ondragleave="leaveStall(this)" ondrop="dropGuest(event,this)" onclick="stallClick(this)"><div class="stallIcon">🍔</div><div class="stallName">Fast Service Lane</div><div class="stallHint">Quick queue and service</div></div>
+    <div class="stall" data-stall="italian" ondragover="allowDrop(event)" ondragleave="leaveStall(this)" ondrop="dropGuest(event,this)" onclick="stallClick(this)"><div class="stallIcon">🍝</div><div class="stallName">Italian Tradition Stall</div><div class="stallHint">Classic family recipes</div></div>
+    <div class="stall" data-stall="kids" ondragover="allowDrop(event)" ondragleave="leaveStall(this)" ondrop="dropGuest(event,this)" onclick="stallClick(this)"><div class="stallIcon">🧃</div><div class="stallName">Kid-Friendly Corner</div><div class="stallHint">Simple and family-friendly</div></div>
+  </div>
+  <div class="guests">
+    <div class="guestCard" draggable="true" data-need="vegetarian" ondragstart="dragGuest(event)" onclick="selectGuest(this)"><div class="guestAvatar">👩🏽‍🍳</div><div class="guestFlag">🇮🇳</div><div class="guestNeed">“I’m vegetarian.”</div></div>
+    <div class="guestCard" draggable="true" data-need="japanese" ondragstart="dragGuest(event)" onclick="selectGuest(this)"><div class="guestAvatar">👨🏻‍💼</div><div class="guestFlag">🇯🇵</div><div class="guestNeed">“I prefer lighter flavours.”</div></div>
+    <div class="guestCard" draggable="true" data-need="fast" ondragstart="dragGuest(event)" onclick="selectGuest(this)"><div class="guestAvatar">👱🏻‍♂️</div><div class="guestFlag">🇺🇸</div><div class="guestNeed">“I need fast service.”</div></div>
+    <div class="guestCard" draggable="true" data-need="italian" ondragstart="dragGuest(event)" onclick="selectGuest(this)"><div class="guestAvatar">👩🏻‍🍳</div><div class="guestFlag">🇮🇹</div><div class="guestNeed">“Please keep our traditional recipe.”</div></div>
+    <div class="guestCard" draggable="true" data-need="kids" ondragstart="dragGuest(event)" onclick="selectGuest(this)"><div class="guestAvatar">👦🏻</div><div class="guestFlag">🇸🇬</div><div class="guestNeed">“We have many kids.”</div></div>
+  </div>
+  <div class="feedback" id="feedback">Match all 5 guests to build bridges.</div>
+  <div class="submitRow"><button class="miniBtn blue" onclick="resetBridge()">↻ Reset</button></div>
+</div>`}}
+function pickMulti(btn,correct){if(btn.disabled)return;btn.disabled=true;if(correct){btn.classList.add('good');selected++;score+=100;document.getElementById('jasonFace').textContent='😁';document.getElementById('feedback').textContent='Correct! That shows cultural awareness.';beep(880,.12,'square',.45);if(selected>=levels[level].need)success()}else{btn.classList.add('bad');score=Math.max(0,score-50);document.getElementById('jasonFace').textContent='😱';document.getElementById('feedback').textContent='Oops. That may create conflict or disrespect.';beep(140,.22,'sawtooth',.45)}document.getElementById('scoreBox').textContent='Score: '+score}
+function pickSingle(btn,correct){if(correct){btn.classList.add('good');score+=200;document.getElementById('feedback').textContent='Excellent! Respect first, then discuss changes.';beep(950,.15,'square',.48);success()}else{btn.classList.add('bad');score=Math.max(0,score-60);document.getElementById('feedback').textContent='Try again. Choose the respectful response.';beep(140,.2,'sawtooth',.45)}document.getElementById('scoreBox').textContent='Score: '+score}
+let selectedGuest=null;
+function selectGuest(el){
+  if(el.classList.contains('matched'))return;
+  document.querySelectorAll('.guestCard').forEach(g=>g.classList.remove('selected'));
+  selectedGuest=el; el.classList.add('selected');
+  document.getElementById('feedback').textContent='Now choose the best food stall for this guest.';
+  beep(520,.08,'square',.32);
+}
+function dragGuest(ev){selectedGuest=ev.currentTarget;ev.dataTransfer.setData('need',selectedGuest.dataset.need)}
+function allowDrop(ev){ev.preventDefault();ev.currentTarget.classList.add('over')}
+function leaveStall(el){el.classList.remove('over')}
+function dropGuest(ev,stall){ev.preventDefault();stall.classList.remove('over'); if(!selectedGuest){return} matchGuestToStall(selectedGuest,stall)}
+function stallClick(stall){if(!selectedGuest){document.getElementById('feedback').textContent='Pick a guest first, then choose a stall.';beep(250,.12,'sawtooth',.35);return} matchGuestToStall(selectedGuest,stall)}
+function matchGuestToStall(guest,stall){
+  if(guest.classList.contains('matched'))return;
+  const correct=guest.dataset.need===stall.dataset.stall;
+  if(correct){
+    guest.classList.remove('selected'); guest.classList.add('matched'); stall.classList.add('done');
+    bridgeCount++; score+=150; document.getElementById('jasonFace').textContent='😁';
+    document.getElementById('feedback').textContent='Great bridge! This guest feels included.';
+    selectedGuest=null; beep(900,.12,'square',.48);
+    if(bridgeCount>=5)success();
+  }else{
+    score=Math.max(0,score-50); document.getElementById('jasonFace').textContent='😬';
+    document.getElementById('feedback').textContent='Not the best fit. Think about the guest’s need.';
+    beep(150,.2,'sawtooth',.45);
+  }
+  document.getElementById('scoreBox').textContent='Score: '+score;
+}
+function resetBridge(){bridgeCount=0;selectedGuest=null;renderLevel(levels[level]);beep(420,.1,'square',.35)}
+function success(){clearInterval(timerInt);setTimeout(()=>{score+=Math.max(0,time)*5;level++;confetti();beep(1120,.18,'square',.42);setTimeout(()=>beep(1400,.18,'square',.35),150);if(level>=levels.length){document.getElementById('finalMsg').innerHTML=`Final Score: <b>${score}</b><br>Everyone feels respected and represented.`;show('end');confetti(90)}else showMap()},850)}
+function fail(msg){clearInterval(timerInt);document.getElementById('feedback').textContent=msg;document.getElementById('jasonFace').textContent='😭';beep(120,.35,'sawtooth',.48);setTimeout(startLevel,1400)}
+function confetti(n=45){let c=document.getElementById('confetti');for(let i=0;i<n;i++){let d=document.createElement('div');d.className='piece';d.style.left=Math.random()*100+'vw';d.style.background=['#ffd166','#06d6a0','#118ab2','#ef476f','#8b5cf6'][Math.floor(Math.random()*5)];d.style.animationDelay=Math.random()*.5+'s';c.appendChild(d);setTimeout(()=>d.remove(),3000)}}
+</script>
+</body>
+</html>
